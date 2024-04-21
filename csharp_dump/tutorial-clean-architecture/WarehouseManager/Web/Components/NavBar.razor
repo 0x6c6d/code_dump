@@ -1,0 +1,13 @@
+﻿@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<div class="d-flex flex-row navbar-dark justify-content-between align-items-center" style="height: 100px">
+    <div @onclick="NavigateToDashboard" class="logo-image ms-4">WM</div>
+    @if (!NavigationManager.Uri.Contains("login") || AuthState)
+    {
+        <div class="d-flex flex-row justify-content-end align-items-center">
+            <button @onclick="AddArticle" class="btn btn-custom-nav me-5" style="height: 40px">Add Article</button>
+            <button @onclick="Admin" class="btn btn-custom-nav me-5" style="height: 40px">Admin</button>
+        </div>
+    }
+</div>

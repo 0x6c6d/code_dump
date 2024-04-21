@@ -1,0 +1,28 @@
+﻿@page "/admin"
+
+<div class="w-75 mx-auto mt-4">
+    <div class="d-flex flex-row justify-content-between">
+        <p @onclick=(ActivateGroup) style="cursor: pointer; color: @GroupColor; text-decoration: @GroupUnderscore" class="fw-bold">Groups</p>
+        <p @onclick=(ActivateStoragePlace) style="cursor: pointer; color: @StoragePlaceColor; text-decoration: @StoragePlaceUnderscore" class="fw-bold">Storage Places</p>
+        <p @onclick=(ActivateOperationArea) style="cursor: pointer; color: @OperationAreaColor; text-decoration: @OperationAreaUnderscore" class="fw-bold">Operation Areas</p>
+        <p @onclick=(ActivateProcurement) style="cursor: pointer; color: @ProcurementColor; text-decoration: @ProcurementUnderscore" class="fw-bold">Procurements</p>
+    </div>
+    <div class="mt-5">
+        @if (IsAccountActive)
+        {
+            <AdminGroup />
+        }
+        @if (IsStoragePlaceActive)
+        {
+            <AdminStoragePlace />
+        }
+        @if (IsOperationAreaActive)
+        {
+            <AdminOperationArea />
+        }
+        @if (IsProcurementActive)
+        {
+            <AdminProcurement />
+        }
+    </div>
+</div>

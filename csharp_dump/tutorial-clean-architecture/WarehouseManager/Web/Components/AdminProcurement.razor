@@ -1,0 +1,50 @@
+﻿@inject IProcurementService ProcurementService
+
+<div class="mb-4 d-flex justify-content-center">
+    <span class="fw-bold fs-5">Manage Procurements</span>
+</div>
+<div class="d-flex flex-row justify-content-around mx-auto mb-5">
+    <div style="width: 40%; max-width: 400px">
+        <label class="form-label fw-bold">Add Procurement:</label>
+        <div class="d-flex flex-column">
+            <label class="form-label">Name:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementNew.Name"></InputText>
+            <label class="form-label">Email:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementNew.Email"></InputText>
+            <label class="form-label">Telefon:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementNew.Phone"></InputText>
+            <label class="form-label">Link:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementNew.Link"></InputText>
+            <p class="text-danger mt-2">@MessageTop</p>
+            <button style="width: 110px" class="btn btn-custom" onclick="@(() => CreateProcurement(ProcurementNew))">Add</button>
+        </div>
+    </div>
+    <div style="width: 40%; max-width: 400px">
+        <label class="form-label fw-bold">Select Procurement:</label>
+        <InputSelect class="form-control" Value="ProcurementSelected.ProcurementId" ValueExpression="@(() => ProcurementSelected.ProcurementId)" ValueChanged="((Guid procurementId) => HandleChangeEvent(procurementId))">
+            <option value="">-- Select --</option>
+            @if (Procurements?.Count > 0)
+            {
+                @foreach (var procurement in Procurements)
+                {
+                    <option value="@procurement.ProcurementId">@procurement.Name</option>
+                }
+            }
+        </InputSelect>
+        <label class="form-label mt-4 fw-bold">Update Procurement:</label>
+        <div class="d-flex flex-column">
+            <label class="form-label">Name:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementSelected.Name"></InputText>
+            <label class="form-label">Email:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementSelected.Email"></InputText>
+            <label class="form-label">Telefon:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementSelected.Phone"></InputText>
+            <label class="form-label">Link:</label>
+            <InputText class="form-control mb-2" @bind-Value="ProcurementSelected.Link"></InputText>
+            <button style="width: 110px" class="btn btn-custom" onclick="@(() => UpdateProcurement(ProcurementSelected))">Update</button>
+        </div>
+        <p class="text-danger mt-2">@MessageBottom</p>
+
+        <button style="height: 38px" class="btn btn-custom-full mt-5" onclick="@(() => DeleteProcurement(ProcurementSelected.ProcurementId))">Delete</button>
+    </div>
+</div>

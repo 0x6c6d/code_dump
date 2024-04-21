@@ -1,0 +1,160 @@
+﻿@inject IArticleService ArticleService
+@inject IProcurementService ProcurementService
+@inject IEntityService<GroupModel> GroupService
+@inject IEntityService<StoragePlaceModel> StoragePlaceService
+@inject IEntityService<OperationAreaModel> OperationAreaService
+
+<div class="modal bg-dark bg-opacity-75" style="display: @(ShowModal ? "block" : "none")">
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="text-danger">@Message</p>
+    }
+    
+    <div class="d-flex h-100 justify-content-center align-items-center">
+        <div class="w-75">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Artikeldetails</h1>
+                    <button type="button" @onclick="CloseModal" class="btn-close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@ArticleVM" OnValidSubmit="HandleValidSubmit">
+                        <div class="d-flex flex-row">
+                            <div style="width: 33%">
+                                <div class="border border-dark border-2 mb-4" style="height: 430px">
+                                    <img src="@ArticleVM.ImageUrl" alt="@ArticleVM.Name" class="w-100 h-100" style="object-fit: cover">
+                                </div>
+                            </div>
+                            <div style="width: 66%" class="d-flex flex-row justify-content-center">
+                                <div class="w-50">
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Name:</label>
+                                        <div class="px-5">
+                                            <InputText class="form-control" @bind-Value="ArticleVM.Name"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Group:</label>
+                                        <div class="px-5">
+                                            <InputSelect class="form-control" @bind-Value="ArticleVM.GroupId">
+                                                <option value="">-- Bitte auswählen --</option>
+                                                @if (Groups.Count > 0)
+                                                {
+                                                    @foreach (var group in Groups)
+                                                    {
+                                                        <option value="@group.GroupId">@group.Name</option>
+                                                    }
+                                                }
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Storage Place:</label>
+                                        <div class="px-5">
+                                            <InputSelect class="form-control" @bind-Value="ArticleVM.StoragePlaceId">
+                                                <option value="">-- Bitte auswählen --</option>
+                                                @if (StoragePlaces.Count > 0)
+                                                {
+                                                    @foreach (var storagePlace in StoragePlaces)
+                                                    {
+                                                        <option value="@storagePlace.StoragePlaceId">@storagePlace.Name</option>
+                                                    }
+                                                }
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Storage Bin:</label>
+                                        <div class="px-5">
+                                            <InputText class="form-control" @bind-Value="ArticleVM.StorageBin"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Operation Area:</label>
+                                        <div class="px-5">
+                                            <InputSelect class="form-control" @bind-Value="ArticleVM.OperationAreaId">
+                                                <option value="">-- Select --</option>
+                                                @if (OperationAreas.Count > 0)
+                                                {
+                                                    @foreach (var operationArea in OperationAreas)
+                                                    {
+                                                        <option value="@operationArea.OperationAreaId">@operationArea.Name</option>
+                                                    }
+                                                }
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-50">
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Article Number:</label>
+                                        <div class="px-5">
+                                            <InputText class="form-control" @bind-Value="ArticleVM.ItemNumber"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Procurement:</label>
+                                        <div class="px-5">
+                                            <InputSelect class="form-control" @bind-Value="ArticleVM.ProcurementId">
+                                                <option value="">-- Select --</option>
+                                                @if (Procurements.Count > 0)
+                                                {
+                                                    @foreach (var procurement in Procurements)
+                                                    {
+                                                        <option value="@procurement.ProcurementId">@procurement.Name</option>
+                                                    }
+                                                }
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                    @* Stock should only be changable by the + / - buttons on the dashboard page to ensure that one ticket is properly displayed *@
+                                    @*                                     <div class="mb-3">
+                                    <label class="px-5 form-label">Stock:</label>
+                                    <div class="px-5">
+                                    <InputNumber class="form-control" @bind-Value="ArticleVM.Stock"></InputNumber>
+                                    </div>
+                                    </div> *@
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Min Stock:</label>
+                                        <div class="px-5">
+                                            <InputNumber class="form-control" @bind-Value="ArticleVM.MinStock"></InputNumber>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Image Url:</label>
+                                        <div class="px-5">
+                                            <InputText class="form-control" @bind-Value="ArticleVM.ImageUrl"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="px-5 form-label">Shopping Url:</label>
+                                        <div class="px-5">
+                                            <InputText class="form-control" @bind-Value="ArticleVM.ShoppingUrl"></InputText>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ValidationSummary />
+                        <DataAnnotationsValidator />
+                        <div class="modal-footer d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-custom" @onclick="(() => ShowDeletePage = !ShowDeletePage)">@(ShowDeletePage ? "Hide" : "Delete")</button>
+                            <button type="submit" class="btn btn-custom">Save</button>
+                        </div>
+                        @if (ShowDeletePage)
+                        {
+                            <div class="my-5 border border-dark border-3 p-4">
+                                <h4>Do you want to delete this article?</h4>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button type="button" class="btn btn-custom" @onclick="(() => ShowDeletePage = false)">No</button>
+                                    <button type="button" class="btn btn-custom" @onclick="HandleDelete">Yes</button>
+                                </div>
+                            </div>
+                        }
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

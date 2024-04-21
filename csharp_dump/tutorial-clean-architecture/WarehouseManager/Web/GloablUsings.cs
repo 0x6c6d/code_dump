@@ -1,0 +1,12 @@
+﻿global using Microsoft.Extensions.Options;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+global using Web.Models.AppSettings;
+global using Web.Models.Entities;
+global using Web.Models.DTO;
+global using Web.Models.Exceptions;
+global using Web.Models.ViewModels;
+global using Web.Services.Auth;
+global using Web.Services.BL;
+global using Web.Services.DA;
+global using Web.Helpers;

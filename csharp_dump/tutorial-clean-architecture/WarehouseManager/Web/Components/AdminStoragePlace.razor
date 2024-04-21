@@ -1,0 +1,38 @@
+﻿@inject IEntityService<StoragePlaceModel> StoragePlaceService
+
+<div style="width: 33%" class="d-flex flex-column mx-auto">
+    <div class="fw-bold fs-5 mb-4">Manage Storage Place</div>
+    <div>
+        <label class="form-label fw-bold" for="new-group">Add  Storage Place:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="StoragePlaceNew.Name"></InputText>
+            <button style="width: 110px" class="btn btn-custom" onclick="@(() => CreateStoragePlace(StoragePlaceNew))">Add</button>
+        </div>
+        <p class="text-danger mt-2">@MessageTop</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <div>
+        <label class="form-label fw-bold">Select Storage Place:</label>
+        <InputSelect class="form-control" Value="StoragePlaceSelected.StoragePlaceId" ValueExpression="@(() => StoragePlaceSelected.StoragePlaceId)" ValueChanged="((Guid storagePlaceId) => HandleChangeEvent(storagePlaceId))">
+            <option value="">-- Select --</option>
+            @if (StoragePlaces?.Count > 0)
+            {
+                @foreach (var storagePlace in StoragePlaces)
+                {
+                    <option value="@storagePlace.StoragePlaceId">@storagePlace.Name</option>
+                }
+            }
+        </InputSelect>
+
+        <label class="form-label mt-4 fw-bold">Update Storage Place:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="StoragePlaceSelected.Name">@StoragePlaceSelected.Name</InputText>
+            <button style="width: 110px" class="btn btn-custom" onclick="@(() => UpdateStoragePlace(StoragePlaceSelected))">Update</button>
+        </div>
+        <p class="text-danger mt-2">@MessageBottom</p>
+
+        <button style="height: 38px" class="btn btn-custom-full mt-5" onclick="@(() => DeleteStoragePlace(StoragePlaceSelected.StoragePlaceId))">Delete</button>
+    </div>
+</div>

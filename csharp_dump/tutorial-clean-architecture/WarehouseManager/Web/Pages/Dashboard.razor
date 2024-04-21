@@ -1,0 +1,77 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IArticleService ArticleService
+@inject IAuthService AuthService
+
+<h3>Warehouse Manager</h3>
+
+@if (AuthState)
+{
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="text-danger">@Message</p>
+    }
+    
+    <ArticleDetails @ref="ArticleDetailsRef" OnUpdate="HandleUpdate" OnDelete="HandleDelete" />
+
+    <div class="float-end my-3">
+        <span class="me-2" style="color: #767676">@($"{FilteredArticles.Count} article found")</span>
+        <input type="text" @bind="SearchTerm" placeholder="Search...">
+    </div>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Nr.</th>
+                <th scope="col">Name</th>
+                <th scope="col">Article Id</th>
+                <th scope="col">Group</th>
+                <th scope="col">Operation Area</th>
+                <th scope="col">Storage Place</th>
+                <th scope="col">Storage Bin</th>
+                <th scope="col">Procurement</th>
+                <th scope="col">Stock</th>
+                <th scope="col">Min. Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in FilteredArticles)
+            {
+                Counter++;
+                <tr @onclick="(() => ShowDetails(article.ArticleId))" style="@(article.Stock <= article.MinStock ? "background-color: #cc7670;" : "")">
+                    <th scope="row">@Counter</th>
+                    <td>@article.Name</td>
+                    <td>@article.ItemNumber</td>
+                    <td>@article.Group.Name</td>
+                    <td>@article.OperationArea.Name</td>
+                    <td>@article.StoragePlace.Name</td>
+                    <td>@article.StorageBin</td>
+                    <td>@article.Procurement.Name</td>
+                    <td>@article.Stock</td>
+                    <td>@article.MinStock</td>
+                    <div class="d-flex flex-row justify-content-between" style="width: 240px">
+                        <button class="btn btn-custom-table" @onclick:stopPropagation="true" @onclick="(() => UpdateStock(article.ArticleId, 1))">+</button>
+                        <button class="btn btn-custom-table" @onclick:stopPropagation="true" @onclick="(() => UpdateStock(article.ArticleId, -1))">-</button>
+                        <div style="border-left: 2px solid black; height: 45px"></div>
+                        @if (string.IsNullOrEmpty(article.ShoppingUrl))
+                        {
+                            <div class="btn btn-custom-table-disabled" @onclick:stopPropagation="true">
+                                <img src="images/shopping-bag.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="btn btn-custom-table" @onclick:stopPropagation="true" @onclick="(() => OpenShoppingUrl(article.ShoppingUrl))">
+                                <img src="images/shopping-bag.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                            </button>
+                        }
+                    </div>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Please log in</p>
+}

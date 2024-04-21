@@ -1,0 +1,20 @@
+﻿@page "/login"
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject IOptions<AppSettings> AppSettings
+
+<div class="mt-5 row">
+    <div class="card col-4 me-auto ms-auto p-3">
+        <h3 class="card-title ms-2">Login</h3>
+        <div class="card-body">
+            <EditForm Model="@LoginModel" OnValidSubmit="(() => HandleValidSubmit(LoginModel.PIN))">
+                <label class="form-label" for="pin">PIN:</label>
+                <div class="">
+                    <InputText type="password" id="pin" class="form-control login-field" @bind-Value="@LoginModel.PIN"></InputText>
+                </div>
+                <span class="label text-danger my-3">@Message</span>
+                <button type="submit" class="btn btn-custom-full mt-4">Login</button>
+            </EditForm>
+        </div>
+    </div>
+</div>

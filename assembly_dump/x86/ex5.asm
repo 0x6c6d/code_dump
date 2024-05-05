@@ -1,3 +1,5 @@
+; push bytes to the stack
+
 global _start
 
 _start:

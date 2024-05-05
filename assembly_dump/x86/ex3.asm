@@ -1,7 +1,9 @@
+; for loop
+
 global _start
     
 section .data
-    msg db 0        ; db = define-byte -> msg var has the size of one byte
+    msgOne db 0        ; db = define-byte -> msg var has the size of one byte
 
 section .text
 _start:
@@ -18,8 +20,8 @@ exit:
     ; print value of ecx
     mov eax, 4          ; sys_write
     mov ebx, 1          ; file descriptor for stdout
-    mov [msg], ecx
-    mov ecx, msg
+    mov [msgOne], ecx
+    mov ecx, msgOne
     mov edx, 4          ; length of msg
     int 0x80            ; syscall
 

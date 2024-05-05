@@ -8,9 +8,9 @@
 			"args": [
 				"-m",
 				"elf_i386",
-				"./bin/ex.o",
+				"./bin/ex6.o",
 				"-o",
-				"./bin/ex"
+				"./bin/ex6"
 			],
 			"problemMatcher": [],
 			"dependsOn": "Build",
@@ -26,9 +26,9 @@
 			"args": [
 				"-f",
 				"elf32",
-				"ex.asm",
+				"ex6.asm",
 				"-o",
-				"./bin/ex.o"
+				"./bin/ex6.o"
 			],
 			"group": "build",
 			"problemMatcher": {

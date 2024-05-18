@@ -8,7 +8,7 @@
 ; IDE               : SASM -> uses gcc as linker
 
 section .data                       ; contains initialized data
-    Msg: db "Hello World!", 0x0A
+    Msg: db "Hello World!", 0x0A    ; variable names represent addresses & not the data itself
     MsgLen: equ $-Msg
 
 section .text

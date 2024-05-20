@@ -68,6 +68,16 @@ Repeat:
     mov rbx, 5              ; Divisor
     div rbx
     
+    ; stack
+    mov ax, 01234h
+    mov bx, 05678h
+    mov rcx, 0FFFFFFFFAABBCCDDh
+    push ax
+    push bx
+    push rcx
+    pop ax          ; CCDD
+    pop rbx         ; 5678FFFFFFFFAABB
+    
     ; --- exit program ---
     mov rax, 60
     mov rdi, 0

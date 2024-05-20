@@ -1,4 +1,4 @@
-; Executable name   : EATSYSCALL
+; Executable name   : gcc-linker
 ; Version           : 1.0
 ; Created date      : 17.05.24
 ; Last updated      : 17.05.24

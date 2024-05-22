@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveServer
+@inject ICategoryService categoryService
+
+<div style="width: 33%" class="d-flex flex-column mx-auto">
+    <div class="fw-bold fs-5 mb-4">Kategorien verwalten</div>
+    <div>
+        <label class="form-label fw-bold">Kategorie hinzufügen:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="categoryNew.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => CreateCategory(categoryNew))">Hinzufügen</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageTop</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <div>
+        <label class="form-label fw-bold">Kategorie auswählen:</label>
+        <InputSelect class="form-control" Value="categorySelected.Id" ValueExpression="@(() => categorySelected.Id)" ValueChanged="((Guid id) => HandleChangeEvent(id))">
+            <option value="@Guid.Empty">-- Bitte Kategorie auswählen --</option>
+            @if (categories.Count > 0)
+            {
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            }
+        </InputSelect>
+
+        <label class="form-label mt-4 fw-bold">Kategorie updaten:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="categorySelected.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => UpdateCategory(categorySelected))">Updaten</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageBottom</p>
+
+        <button style="height: 38px" class="btn btn-app-full mt-5" onclick="@(() => DeleteCategory(categorySelected.Id))">Löschen</button>
+    </div>
+</div>

@@ -1,0 +1,213 @@
+﻿@page "/warehouse-manager"
+@rendermode InteractiveServer
+@attribute [StreamRendering(true)]
+@inject IArticleService articleService
+@inject IProcurementService procurementService
+@inject IJSRuntime jsRuntime
+@inject NavigationManager navManager
+@using Presentation.Components.Pages.WarehouseManager.Shared
+
+<PageTitle>Warehouse Manager</PageTitle>
+
+<Header />
+
+<Details @ref="detailsRef" OnUpdate="HandleUpdate" />
+<ProcurementDetails @ref="procurementDetailsRef" />
+
+<div class="box-element p-4 d-flex flex-column" style="flex: 1">
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p class="text-danger">@message</p>
+    }
+
+    @* Search Header *@
+    <div class="d-flex flex-row justify-content-end my-3">
+        <span class="me-2" style="width: 100px; color: #767676">@($"{filteredArticles.Count} Artikel gefunden")</span>
+        <input type="text" class="form-control" style="width: 200px" @oninput="FilterArticles" placeholder="Suche...">
+    </div>
+
+    @* Table Nr. 1 *@
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 3%">Nr.</th>
+                <th scope="col" @onclick="() => SortTableWithCategory(0)" style="width: 12%; cursor: pointer">Name</th>
+                <th scope="col" @onclick="() => SortTableWithCategory(1)" style="width: 12%; cursor: pointer">Seriennummer</th>
+                <th scope="col" @onclick="() => SortTableWithCategory(2)" style="width: 12%; cursor: pointer">Inventarnummer</th>
+                <th scope="col" @onclick="() => SortTableWithCategory(3)" style="width: 12%; cursor: pointer">Einsatzgebiet</th>
+                <th scope="col" @onclick="() => SortTableWithCategory(4)" style="width: 12%; cursor: pointer">Lagerort</th>
+                <th scope="col" @onclick="() => SortTableWithCategory(5)" style="width: 12%; cursor: pointer">Filiale</th>
+                <th scope="col" style="min-width: 300px">Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (articlesWithCategory == null)
+            {
+                <p class="my-3">Loading...</p>
+            }
+            else if (articlesWithCategory?.Count() == 0)
+            {
+                <tr>
+                    <td colspan="12">Keine Artikel gefunden</td>
+                </tr>
+            }
+            else if (articlesWithCategory?.Count() > 0)
+            {
+                @foreach (var group in articlesWithCategory)
+                {
+                    <tr class="category-row" @onclick="() => ToggleCategory(group.Key)" style="@(expandedCategories.Contains(group.Key) || expandAll ? "background-color: rgba(33, 37, 41, 0.075)" : "")">
+                        <td colspan="7" style="cursor: pointer">
+                            <div class="d-flex flex-row">
+                                <div class="me-2">
+                                    @if (expandedCategories.Contains(group.Key) || expandAll)
+                                    {
+                                        <img src="images/icons/arrow_down.svg" style="width: 20px; height: 20px" />
+                                    }
+                                    else
+                                    {
+                                        <img src="images/icons/arrow_right.svg" style="width: 20px; height: 20px" />
+                                    }
+                                </div>
+                                <div>
+                                    <span class="d-block">@group.Key</span>
+                                    @if (group.Key.Equals("Entsorgt", StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        <span>(Gesamt: @group.Count())</span>
+                                    }
+                                    else{
+                                        <span>(Gesamt: @group.Count() | Auf Lager: @group.Where(x => string.IsNullOrEmpty(x.Store)).Count())</span>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td style="vertical-align: middle">
+                            <div>
+                                @if (!group.Any(x => x.CategoryId == disposeId))
+                                {
+                                    <button class="btn btn-app-category-table icon-container" @onclick:stopPropagation="true" @onclick="() => AddArticleTemplate(group.Key)">
+                                        +
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    @if (expandedCategories.Contains(group.Key) || expandAll)
+                    {
+                        @foreach (var (index, article) in group.Select((item, index) => (index, item)))
+                        {
+                            <tr @onclick="(() => ShowDetails(article.Id))">
+                                <th>@(index + 1)</th>
+                                @if (group.Key.Equals("Entsorgt", StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    <td>@article.Name (@article.Disposed!.Value.ToShortDateString())</td>
+                                }
+                                else
+                                {
+                                    <td>@article.Name</td>
+                                }
+                                <td>@article.SerialNumber</td>
+                                <td>@article.InventoryNumber</td>
+                                <td>@article.OperationArea.Name</td>
+                                <td>@article.StoragePlace.Name</td>
+                                <td>@article.Store</td>
+                                <td>
+                                    @if (article.ProcurementId == null || article.ProcurementId == Guid.Empty)
+                                    {
+                                        <div class="btn btn-app-table-disabled" @onclick:stopPropagation="true">
+                                            <img src="images/icons/truck-white.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-app-table icon-container" @onclick:stopPropagation="true" @onclick="(() => ShowProcurementDetails(article.ProcurementId))">
+                                            <img src="images/icons/truck-white.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                            <img src="images/icons/truck-black.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            }
+        </tbody>
+    </table>
+
+    <div style="height: 100px"></div>
+
+    @* Table Nr. 2 *@
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 3%">Nr.</th>
+                <th scope="col" @onclick="() => SortTableWithoutCategory(0)" style="width: 12%; cursor: pointer">Name</th>
+                <th scope="col" @onclick="() => SortTableWithoutCategory(1)" style="width: 12%; cursor: pointer">Einsatzgebiet</th>
+                <th scope="col" @onclick="() => SortTableWithoutCategory(2)" style="width: 12%; cursor: pointer">Lagerort</th>
+                <th scope="col" @onclick="() => SortTableWithoutCategory(3)" style="width: 12%; cursor: pointer">Gruppe</th>
+                <th scope="col" @onclick="() => SortTableWithoutCategory(4)" style="width: 12%; cursor: pointer">Bestand</th>
+                <th scope="col" @onclick="() => SortTableWithoutCategory(5)" style="width: 12%; cursor: pointer">Min. Bestand</th>
+                <th scope="col" style="min-width: 300px">Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (articlesWithoutCategory == null)
+            {
+                <p class="my-3">Loading...</p>
+            }
+            else if (articlesWithoutCategory?.Count() == 0)
+            {
+                <tr>
+                    <td colspan="12">Keine Artikel gefunden</td>
+                </tr>
+            }
+            else if (articlesWithoutCategory?.Count() > 0)
+            {
+                @foreach (var (index, article) in articlesWithoutCategory.Select((item, index) => (index, item)))
+                {
+                    <tr @onclick="(() => ShowDetails(article.Id))" style="@(article.Stock <= article.MinStock ? "background-color: #cc7670;" : "")">
+                        <th>@(index + 1)</th>
+                        <td>@article.Name</td>
+                        <td>@article.OperationArea.Name</td>
+                        <td>@article.StoragePlace.Name</td>
+                        <td>@article.Group.Name</td>
+                        <td>@article.Stock</td>
+                        <td>@article.MinStock</td>
+                        <td>
+                            <div class="d-flex flex-row justify-content-between" style="width: 240px">
+                                <button class="btn btn-app-table" @onclick:stopPropagation="true" @onclick="(() => UpdateStock(article.Id, 1))">+</button>
+                                <button class="btn btn-app-table" @onclick:stopPropagation="true" @onclick="(() => UpdateStock(article.Id, -1))">-</button>
+                                <div style="border-left: 2px solid black; height: 45px"></div>
+                                @if (article.ProcurementId == null || article.ProcurementId == Guid.Empty)
+                                {
+                                    <div class="btn btn-app-table-disabled" @onclick:stopPropagation="true">
+                                        <img src="images/icons/truck-white.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-app-table icon-container" @onclick:stopPropagation="true" @onclick="(() => ShowProcurementDetails(article.ProcurementId))">
+                                        <img src="images/icons/truck-white.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                        <img src="images/icons/truck-black.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                    </button>
+                                }
+                                @if (string.IsNullOrEmpty(article.ShoppingUrl))
+                                {
+                                    <div class="btn btn-app-table-disabled" @onclick:stopPropagation="true">
+                                        <img src="images/icons/shopping-bag-white.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-app-table icon-container" @onclick:stopPropagation="true" @onclick="(() => OpenShoppingUrl(article.ShoppingUrl))">
+                                        <img src="images/icons/shopping-bag-white.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                        <img src="images/icons/shopping-bag-black.svg" style="width: 20px; height: 20px; vertical-align: unset" />
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

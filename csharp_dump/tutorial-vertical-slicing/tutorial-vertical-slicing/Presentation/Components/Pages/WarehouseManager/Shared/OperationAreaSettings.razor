@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveServer
+@inject IOperationAreaService operationAreaService
+
+<div style="width: 33%" class="d-flex flex-column mx-auto">
+    <div class="fw-bold fs-5 mb-4">Einsatzgebiete verwalten</div>
+    <div>
+        <label class="form-label fw-bold">Einsatzgebiet hinzufügen:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="operationAreaNew.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => CreateOperationArea(operationAreaNew))">Hinzufügen</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageTop</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <div>
+        <label class="form-label fw-bold">Einsatzgebiet auswählen:</label>
+        <InputSelect class="form-control" Value="operationAreaSelected.Id" ValueExpression="@(() => operationAreaSelected.Id)" ValueChanged="((Guid id) => HandleChangeEvent(id))">
+            <option value="@Guid.Empty">-- Bitte Einsatzgebiet auswählen --</option>
+            @if (operationAreas.Count > 0)
+            {
+                @foreach (var group in operationAreas)
+                {
+                    <option value="@group.Id">@group.Name</option>
+                }
+            }
+        </InputSelect>
+
+        <label class="form-label mt-4 fw-bold">Einsatzgebiet updaten:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="operationAreaSelected.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => UpdateOperationArea(operationAreaSelected))">Updaten</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageBottom</p>
+
+        <button style="height: 38px" class="btn btn-app-full mt-5" onclick="@(() => DeleteOperationArea(operationAreaSelected.Id))">Löschen</button>
+    </div>
+</div>

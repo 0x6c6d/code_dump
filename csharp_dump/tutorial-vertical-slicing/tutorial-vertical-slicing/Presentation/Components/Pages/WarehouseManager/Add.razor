@@ -1,0 +1,207 @@
+﻿@page "/warehouse-manager/add-article"
+@rendermode InteractiveServer
+@using Presentation.Components.Pages.WarehouseManager.Shared;
+@inject IArticleService articleService
+@inject ICategoryService categoryService
+@inject IGroupService groupService
+@inject IOperationAreaService operationAreaService
+@inject IProcurementService procurementService
+@inject IStoragePlaceService storagePlaceService
+@inject IAxService storeService
+@inject NavigationManager navManager
+
+<PageTitle>Warehouse Manager</PageTitle>
+
+<Header />
+
+<div class="container box-element p-4">
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p class="text-danger">@message</p>
+    }
+
+    <EditForm Model="@articleVm" OnValidSubmit="HandleValidSubmit">
+        <div class="d-flex flex-row">
+            <div style="width: 33%">
+                <div class="border border-dark border-2 mb-4" style="height: 430px">
+                    <img src="@articleVm.ImageUrl" alt="@articleVm.Name" class="w-100 h-100" style="object-fit: cover">
+                </div>
+            </div>
+            <div style="width: 66%">
+                <div>
+                    <p class="px-5 fw-bold">Erforderlich</p>
+                    <div class="d-flex flex-row">
+                        <div class="w-50">
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Name:</label>
+                                <div class="px-5">
+                                    <InputText class="form-control" @bind-Value="articleVm.Name"></InputText>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Kategorie:</label>
+                                <div class="px-5">
+                                    <InputSelect class="form-control" @bind-Value="articleVm.CategoryId" @oninput="CategoryInputChange">
+                                        <option value="@Guid.Empty">-- Bitte auswählen --</option>
+                                        @if (categories.Count > 0)
+                                        {
+                                            @foreach (var category in categories)
+                                            {
+                                                <option value="@category.Id">@category.Name</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            @if (showStockInputFields)
+                            {
+                                <div class="mb-3">
+                                    <label class="px-5 form-label">Bestand:</label>
+                                    <div class="px-5">
+                                        <InputNumber class="form-control" @bind-Value="articleVm.Stock"></InputNumber>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="px-5 form-label">Mindestbestand:</label>
+                                    <div class="px-5">
+                                        <InputNumber class="form-control" @bind-Value="articleVm.MinStock"></InputNumber>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="w-50">
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Gruppe:</label>
+                                <div class="px-5">
+                                    <InputSelect class="form-control" @bind-Value="articleVm.GroupId">
+                                        <option value="">-- Bitte auswählen --</option>
+                                        @if (groups.Count > 0)
+                                        {
+                                            @foreach (var group in groups)
+                                            {
+                                                <option value="@group.Id">@group.Name</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Einsatzgebiet:</label>
+                                <div class="px-5">
+                                    <InputSelect class="form-control" @bind-Value="articleVm.OperationAreaId">
+                                        <option value="">-- Bitte auswählen --</option>
+                                        @if (operationAreas.Count > 0)
+                                        {
+                                            @foreach (var operationArea in operationAreas)
+                                            {
+                                                <option value="@operationArea.Id">@operationArea.Name</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Lagerort:</label>
+                                <div class="px-5">
+                                    <InputSelect class="form-control" @bind-Value="articleVm.StoragePlaceId" @oninput="StoragePlaceInputChange">
+                                        <option value="">-- Bitte auswählen --</option>
+                                        @if (storagePlaces.Count > 0)
+                                        {
+                                            @foreach (var storagePlace in storagePlaces)
+                                            {
+                                                <option value="@storagePlace.Id">@storagePlace.Name</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            @if (showStoreInputFields)
+                            {
+                                <div class="mb-3">
+                                    <label class="px-5 form-label">Filiale:</label>
+                                    <div class="px-5">
+                                        <input class="form-control"
+                                               type="text"
+                                               @bind="@searchTerm"
+                                               @oninput="FilterStores"
+                                               @onfocus="ShowDropdown"
+                                               @onblur="HideDropdown" />
+                                        @if (showDropdownList)
+                                        {
+                                            <div class="dropdown" style="position: relative;">
+                                                <ul class="dropdown-menu show"
+                                                    style="display: block; position: absolute; max-height: 200px; overflow-y: auto;">
+                                                    @foreach (var store in filteredStores)
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item" @onmousedown="() => SelectStore(store)">@store</a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="px-5 fw-bold mt-4">Optional</p>
+                    <div class="d-flex flex-row">
+                        <div class="w-50">
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Lieferant:</label>
+                                <div class="px-5">
+                                    <InputSelect class="form-control" @bind-Value="articleVm.ProcurementId">
+                                        <option value="">-- Bitte auswählen --</option>
+                                        @if (procurements.Count > 0)
+                                        {
+                                            @foreach (var procurement in procurements)
+                                            {
+                                                <option value="@procurement.Id">@procurement.Name</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Shopping-Url:</label>
+                                <div class="px-5">
+                                    <InputText class="form-control" @bind-Value="articleVm.ShoppingUrl"></InputText>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="px-5 form-label">Bild-Url:</label>
+                                <div class="px-5">
+                                    <InputText class="form-control" @bind-Value="articleVm.ImageUrl"></InputText>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-50">
+                            @if (showArticleNumbers)
+                            {
+                                <div class="mb-3">
+                                    <label class="px-5 form-label">Seriennummer:</label>
+                                    <div class="px-5">
+                                        <InputText class="form-control" @bind-Value="articleVm.SerialNumber"></InputText>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="px-5 form-label">Inventarnummer:</label>
+                                    <div class="px-5">
+                                        <InputText class="form-control" @bind-Value="articleVm.InventoryNumber"></InputText>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ValidationSummary />
+        <DataAnnotationsValidator />
+        <p class="text-danger mt-2">@message</p>
+        <button class="btn btn-app-full mt-5" type="submit">Anlegen</button>
+    </EditForm>
+</div>

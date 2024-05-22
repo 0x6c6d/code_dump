@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveServer
+@inject IStoragePlaceService storagePlaceService
+
+<div style="width: 33%" class="d-flex flex-column mx-auto">
+    <div class="fw-bold fs-5 mb-4">Lagerplatz verwalten</div>
+    <div>
+        <label class="form-label fw-bold">Lagerplatz hinzufügen:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="storagePlaceNew.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => CreateStoragePlace(storagePlaceNew))">Hinzufügen</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageTop</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <div>
+        <label class="form-label fw-bold">Lagerplatz auswählen:</label>
+        <InputSelect class="form-control" Value="storagePlaceSelected.Id" ValueExpression="@(() => storagePlaceSelected.Id)" ValueChanged="((Guid id) => HandleChangeEvent(id))">
+            <option value="@Guid.Empty">-- Bitte Lagerplatz auswählen --</option>
+            @if (storagePlaces.Count > 0)
+            {
+                @foreach (var group in storagePlaces)
+                {
+                    <option value="@group.Id">@group.Name</option>
+                }
+            }
+        </InputSelect>
+
+        <label class="form-label mt-4 fw-bold">Lagerplatz updaten:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="storagePlaceSelected.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => UpdateStoragePlace(storagePlaceSelected))">Updaten</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageBottom</p>
+
+        <button style="height: 38px" class="btn btn-app-full mt-5" onclick="@(() => DeleteGroup(storagePlaceSelected.Id))">Löschen</button>
+    </div>
+</div>

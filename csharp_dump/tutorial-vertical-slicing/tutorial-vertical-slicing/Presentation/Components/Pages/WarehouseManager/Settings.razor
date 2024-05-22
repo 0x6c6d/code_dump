@@ -1,0 +1,41 @@
+﻿@page "/warehouse-manager/settings"
+@rendermode InteractiveServer
+@inject IMediator mediator
+@inject NavigationManager navManager
+@using Presentation.Components.Pages.WarehouseManager.Shared
+
+<PageTitle>Warehouse Manager</PageTitle>
+
+<Header />
+
+<div class="container box-element p-4">
+    <div class="d-flex flex-row justify-content-between">
+        <p @onclick=(ActivateGroup) style="cursor: pointer; color: @groupColor; text-decoration: @groupUnderscore" class="fw-bold">Gruppen</p>
+        <p @onclick=(ActivateCategory) style="cursor: pointer; color: @categoryColor; text-decoration: @categoryUnderscore" class="fw-bold">Kategorie</p>
+        <p @onclick=(ActivateStoragePlace) style="cursor: pointer; color: @storagePlaceColor; text-decoration: @storagePlaceUnderscore" class="fw-bold">Lagerorte</p>
+        <p @onclick=(ActivateOperationArea) style="cursor: pointer; color: @operationAreaColor; text-decoration: @operationAreaUnderscore" class="fw-bold">Einsatzgebiet</p>
+        <p @onclick=(ActivateProcurement) style="cursor: pointer; color: @procurementColor; text-decoration: @procurementUnderscore" class="fw-bold">Lieferanten</p>
+    </div>
+    <div class="my-5">
+        @if (isGroupActive)
+        {
+            <GroupSettings />
+        }
+        @if (isCategoryActive)
+        {
+            <CategorySettings />
+        }
+        @if (isStoragePlaceActive)
+        {
+            <StoragePlaceSettings />
+        }
+        @if (isOperationAreaActive)
+        {
+            <OperationAreaSettings />
+        }
+        @if (isProcurementActive)
+        {
+            <ProcurementSettings />
+        }
+    </div>
+</div>

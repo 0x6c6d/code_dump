@@ -1,0 +1,33 @@
+﻿@rendermode InteractiveServer
+@using Application.Features.StoreManager.Stores.Services;
+@inject IStoreService storeService
+
+<div class="modal bg-dark bg-opacity-75" style="display: @(showModal ? "block" : "none")">
+    <div class="d-flex h-100 justify-content-center align-items-center">
+        <div class="w-25" style="max-height: 100%; min-width: 400px !important">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Filiale hinzufügen</h1>
+                    <button type="button" @onclick="CloseModal" class="btn-close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@storeVm" OnValidSubmit="HandleSubmit">
+                        <div class="py-4 px-5">
+                            <label class="form-label fw-bold">Filial-Nr:</label>
+                            <div class="mb-4">
+                                <InputText class="form-control" @bind-Value="storeVm.StoreId" />
+                            </div>
+                            <ValidationSummary />
+                            <DataAnnotationsValidator />
+                            @if (!string.IsNullOrEmpty(message))
+                            {
+                                <span class="text-danger">@message</span>
+                            }
+                            <button type="submit" class="btn btn-app-full mt-4">Hinzufügen</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

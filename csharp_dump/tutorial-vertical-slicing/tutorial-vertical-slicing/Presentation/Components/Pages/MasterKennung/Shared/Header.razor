@@ -1,0 +1,113 @@
+﻿@rendermode InteractiveServer
+@inject IJSRuntime jsRuntime
+@inject IStoreService storeService
+@inject ITechnologyService technologyService
+
+<PageTitle>Store Kennung</PageTitle>
+
+<AddStore @ref="addStore" OnAdd="HandleAdd" />
+<DeleteStore @ref="deleteStore" OnDelete="HandleDelete" />
+<Events @ref="storeEvents" />
+
+<script>
+    function clearStoreInputField() {
+        var inputField = document.getElementById("storeInputField");
+        inputField.value = "";
+    }
+
+    function addStoreInputField(storeId) {
+        var inputField = document.getElementById("storeInputField");
+        inputField.value = storeId;
+    }
+</script>
+
+<nav class="navbar navbar-expand-lg" style="margin-top: 40px; margin-bottom: 60px;">
+    <div class="container-fluid px-0">
+        <div>
+            <h2 class="fw-bolder">Store Kennung</h2>
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <span style="color: @(messageError ? " #dc3545" : "#636363" )">@message</span>
+            }
+            else
+            {
+                <span style="color: #636363; @(string.IsNullOrEmpty(selectedStoreId) ? "opacity: 1" : "opacity: 0")">Bitte Filiale auswählen</span>
+            }
+        </div>
+        <div class="d-flex flex-row">
+            <div class="mx-3">
+                <div class="search-container">
+                    @if (searchInputEnabled)
+                    {
+                        <input type="text" class="input-field" placeholder="Suchen..." @onkeydown="HandleKeyDown" @oninput="UpdateSearchInput" @onfocusout="QuerryStoreInformation" @bind-value="searchInput">
+                    }
+                    else
+                    {
+                        <input type="text" class="input-field" placeholder="Filialauswahl entfernen" disabled>
+                    }
+                    <img class="search-icon" src="/images/icons/search.svg" />
+                </div>
+            </div>
+            <div class="mx-3">
+                <div class="d-flex flex-row">
+                    @if (storeSelectionEnabled)
+                    {
+                        @if (showRemoveIcon)
+                        {
+                            <div class="d-flex align-items-center justify-content-center x-btn" style="width: 24px">
+                                <img style="cursor: pointer" src="/images/icons/x.svg" @onclick="RemoveStoreSelection" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="width: 24px"></div>
+                        }
+                        <input class="@(showRemoveIcon ? "input-field-x-btn" : "input-field")"
+                                list="datalistOptions"
+                                placeholder="-- Filiale auswählen --"
+                                id="storeInputField"
+                                @bind-value="storeInputField"
+                                @oninput="HandleStoreSelection">
+                        <datalist id="datalistOptions">
+                            @if (storesFiltered == null || storesFiltered.Count() == 0)
+                            {
+                                <option value="loading">Filialen werden geladen...</option>
+                            }
+                            else
+                            {
+                                foreach (var store in storesFiltered)
+                                {
+                                    <option value="@store.StoreId">@store.Description</option>
+                                }
+                            }
+                        </datalist>
+                    }
+                    else
+                    {
+                        <div style="width: 24px"></div>
+                        <input class="input-field"
+                               list="datalistOptions"
+                               placeholder="-- Änderungen speichern --"
+                               id="storeInputField"
+                               disabled>
+                    }
+                </div>
+            </div>
+            <button class="btn-round mx-2" @onclick="SaveStoreData">
+                <img src="/images/icons/save.svg" />
+            </button>
+            <button class="btn-round mx-2">
+                <img src="/images/icons/revert.svg" @onclick="RevertData" />
+            </button>
+            <button class="btn-round mx-2">
+                <img src="/images/icons/calendar.svg" @onclick="OpenEvents" />
+            </button>
+            <button class="btn-round mx-2" @onclick="OpenAddStore">
+                <img src="/images/icons/add.svg" />
+            </button>
+            <button class="btn-round mx-2" @onclick="DeleteStore">
+                <img src="/images/icons/trash-black.svg" />
+            </button>
+        </div>
+    </div>
+</nav>

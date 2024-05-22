@@ -1,0 +1,285 @@
+﻿@page "/master-kennung"
+@rendermode InteractiveServer
+@inject IAxService axService
+@inject IStoreService storeService
+@inject ITechnologyService technologyService
+@using Application.Features.StoreManager.Technologies
+@using Application.Features.StoreManager.Technologies.Models
+@using Presentation.Components.Pages.MasterKennung.Shared
+
+<PageTitle>Store Kennung</PageTitle>
+
+<Header @ref="headerRef" StoreChange="HandleStoreChange" Save="SaveStoreData" Revert="RevertStoreData" />
+
+<div class="box-element d-flex flex-row" style="flex: 1">
+    @* Filial Info *@
+    <div class="p-4" style="width: 33%">
+        <h4 class="mb-5">Filial-Informationen</h4>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Nummer:</span>
+            <span>@storeInformation.StoreId</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Status:</span>
+            <span>@storeInformation.Status</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Filialtyp:</span>
+            <span>@storeInformation.StoreType</span>
+        </div>
+        <hr />
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Name:</span>
+            <span>@storeInformation.Name</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Center:</span>
+            <span>@storeInformation.Center</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Straße:</span>
+            <span>@storeInformation.Street</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Postleitzahl:</span>
+            <span>@storeInformation.Zip</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Stadt:</span>
+            <span>@storeInformation.City</span>
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Land:</span>
+            @if (string.IsNullOrEmpty(storeInformation.CountryShort))
+            {
+                <span>@storeInformation.CountryLong</span>
+            }
+            else
+            {
+                <span>@storeInformation.CountryLong (@storeInformation.CountryShort)</span>
+            }
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Bundesland:</span>
+            @if (string.IsNullOrEmpty(storeInformation.StateShort))
+            {
+                <span>@storeInformation.State</span>
+            }
+            else
+            {
+                <span>@storeInformation.State (@storeInformation.StateShort)</span>
+            }
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Verkaufsbezirk:</span>
+            @if (string.IsNullOrEmpty(storeInformation.SalesState))
+            {
+                <span>@storeInformation.SalesState</span>
+            }
+            else
+            {
+                <span>@storeInformation.State (@storeInformation.SalesState)</span>
+            }
+        </div>
+        <hr />
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Filialleiter:</span>
+            @if (string.IsNullOrEmpty(storeInformation.StoreManagerId))
+            {
+                <span>@storeInformation.StoreManager</span>
+            }
+            else
+            {
+                <span>@storeInformation.StoreManager (@storeInformation.StoreManagerId)</span>
+            }
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Bezirksleiter:</span>
+            @if (string.IsNullOrEmpty(storeInformation.DistrictManagerId))
+            {
+                <span>@storeInformation.StoreManager</span>
+            }
+            else
+            {
+                <span>@storeInformation.DistrictManager (@storeInformation.DistrictManagerId)</span>
+            }
+        </div>
+        <div class="d-flex flex-row mb-2">
+            <span class="fw-bold" style="width: 200px">Regionalleiter:</span>
+            @if (string.IsNullOrEmpty(storeInformation.RegionalManagerId))
+            {
+                <span>@storeInformation.RegionalManager</span>
+            }
+            else
+            {
+                <span>@storeInformation.RegionalManager (@storeInformation.RegionalManagerId)</span>
+            }
+        </div>
+    </div>
+
+    @* Seperator *@
+    <div style="border-right: 2px solid #EFF0F4"></div>
+
+    @* Filial Technik *@
+    <div class="p-4" style="width: 66%">
+        <h4 class="mb-5">Filial-Technik</h4>
+        <div class="d-flex flex-row">
+            <div style="width: 33%">
+                <h5 class="fw-bold mb-4"><u>Netzwerk</u></h5>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Kasse Name:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.CashDeskName" @onfocusout="HandleInputChanges" disabled></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Kasse IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.CashDeskIp" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Router Modell:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.Router" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Router IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.RouterIp" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Router Ort:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.RouterStoragePlace" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">TK-Anlage Ort:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.TkStoragePlace" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">FritzBox IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.FritzBoxIp" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Access Point:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.AccessPoint" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <hr />
+                <h5 class="fw-bold mb-4"><u>Internet</u></h5>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Anschlusskennung:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.InternetConnectionId" @onfocusout="HandleInternetDataChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Zugangsnummer:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.InternetAccessId" @onfocusout="HandleInternetDataChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Benutzername:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.InternetUserName" disabled></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Passwort:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.InternetPassword" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Kundennummer:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.InternetCustomerId" @onfocusout="HandleInputChanges" disabled></InputText>
+                </div>
+            </div>
+            @* Seperator *@
+            <div class="m-3" style="border-right: 2px solid #EFF0F4"></div>
+            <div style="width: 33%">
+                <h5 class="fw-bold mb-4"><u>Geräte</u></h5>
+                <div class="d-flex flex-row mb-2 align-items-center">
+                    <span class="fw-bold" style="width: 200px">Telefon:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.Phone" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">EC-Terminal Modell:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.EcDevice" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">EC-Terminal ID:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.TerminalId" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">EC-Terminal IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.TerminalIp" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Video-System:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.VideoSystem" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">AppleTV 1. IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.VideoroIpFirst" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">AppleTV 2. IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.VideoroIpSecond" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">MusicMatic IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.MusicMaticIP" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Klima IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.AirConditionerIp" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">KFZ 1. IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.KfzIpFirst" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">KFZ 2. IP:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.KfzIpSecond" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <hr />
+                <h5 class="fw-bold mb-4"><u>Allgemein</u></h5>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Fiskal S/N:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.FiscalSN" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Fiskal Ort:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.FiscalPlace" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+                <div class="d-flex flex-row mb-2">
+                    <span class="fw-bold" style="width: 200px">Schlüsselnummer:</span>
+                    <InputText class="input-field-small" @bind-Value="technologyVm.KeyNumber" @onfocusout="HandleInputChanges"></InputText>
+                </div>
+            </div>
+            @* Seperator *@
+            <div class="m-3" style="border-right: 2px solid #EFF0F4"></div>
+            <div style="width: 33%">
+                <div class="d-flex flex-column mb-3">
+                    <span class="fw-bold mb-2" style="width: 200px">Switch Hersteller:</span>
+                    <InputSelect @bind-Value="technologyVm.Switch" @onfocusout="HandleInputChanges">
+                        <option value="@Switch.NotSelected">-- Bitte auswählen --</option>
+                        @foreach (Switch option in Enum.GetValues(typeof(Switch)))
+                        {
+                            if (option != Switch.NotSelected)
+                            {
+                                <option value="@option">@option</option>
+                            }
+                        }
+                    </InputSelect>
+                </div>
+                <div class="d-flex flex-column mb-3">
+                    <span class="fw-bold mb-2" style="width: 200px">Switch:</span>
+                    @if (technologyVm.Switch == Switch.NotSelected)
+                    {
+                        <input class="input-field-small" disabled>
+                    }
+                    else if (technologyVm.Switch == Switch.Lancom)
+                    {
+                        <input class="input-field-small" disabled value="Siehe LMC">
+                    }
+                    else
+                    {
+                        <InputText class="input-field-small" @bind-Value="technologyVm.SwitchText" @onfocusout="HandleInputChanges"></InputText>
+                    }
+                </div>
+                <div class="d-flex flex-column mb-2">
+                    <span class="fw-bold mb-2" style="width: 200px">Bemerkung:</span>
+                    <InputTextArea class="input-field-text-area" @bind-Value="technologyVm.Comments" @onfocusout="HandleInputChanges"></InputTextArea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

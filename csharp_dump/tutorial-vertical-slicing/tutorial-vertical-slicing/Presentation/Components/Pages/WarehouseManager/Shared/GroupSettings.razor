@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveServer
+@inject IGroupService groupService
+
+<div style="width: 33%" class="d-flex flex-column mx-auto">
+    <div class="fw-bold fs-5 mb-4">Gruppen verwalten</div>
+    <div>
+        <label class="form-label fw-bold">Gruppe hinzufügen:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="groupNew.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => CreateGroup(groupNew))">Hinzufügen</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageTop</p>
+    </div>
+
+    <hr class="my-5" />
+
+    <div>
+        <label class="form-label fw-bold">Gruppe auswählen:</label>
+        <InputSelect class="form-control" Value="groupSelected.Id" ValueExpression="@(() => groupSelected.Id)" ValueChanged="((Guid id) => HandleChangeEvent(id))">
+            <option value="@Guid.Empty">-- Bitte Gruppe auswählen --</option>
+            @if (groups.Count > 0)
+            {
+                @foreach (var group in groups)
+                {
+                    <option value="@group.Id">@group.Name</option>
+                }
+            }
+        </InputSelect>
+
+        <label class="form-label mt-4 fw-bold">Gruppe updaten:</label>
+        <div class="d-flex flex-row">
+            <InputText class="form-control" @bind-Value="groupSelected.Name"></InputText>
+            <button style="width: 110px" class="btn btn-app" onclick="@(() => UpdateGroup(groupSelected))">Updaten</button>
+        </div>
+        <p class="mt-2 @(messageError ? "text-danger" : "text-black")">@messageBottom</p>
+
+        <button style="height: 38px" class="btn btn-app-full mt-5" onclick="@(() => DeleteGroup(groupSelected.Id))">Löschen</button>
+    </div>
+</div>

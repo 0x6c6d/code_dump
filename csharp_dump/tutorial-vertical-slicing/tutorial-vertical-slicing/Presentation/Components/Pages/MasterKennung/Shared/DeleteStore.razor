@@ -1,0 +1,28 @@
+﻿@rendermode InteractiveServer
+@using Application.Features.StoreManager.Stores.Services;
+@inject IStoreService storeService
+
+<div class="modal bg-dark bg-opacity-75" style="display: @(showModal ? "block" : "none")">
+    <div class="d-flex h-100 justify-content-center align-items-center">
+        <div class="w-25" style="max-height: 100%; min-width: 400px !important">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Filiale löschen</h1>
+                    <button type="button" @onclick="CloseModal" class="btn-close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5 class="mt-2 mb-4">Möchtest du diese Filiale wirklich löschen?</h5>
+                    <p>Es werden alle <strong>Termine</strong> & die <strong>technischen Daten</strong> gelöscht</p>
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <p class="text-danger">@message</p>
+                    }
+                    <div class="d-flex flex-row justify-content-between">
+                        <button type="button" @onclick="CloseModal" class="btn btn-app mt-4 me-4">Schließen</button>
+                        <button type="button" @onclick="HandleSubmit" class="btn btn-app mt-4 ms-4">Löschen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,9 +13,9 @@ dotnet ef database update --project Application
 
 <ins>Stored Procedure</ins>
 - create a stored procedure in your local db
-- the query under "Master Kennung -> Stored Procedure" (below) can be executed on your local database to create the stored procedure
+- the query under "Store Manager -> Stored Procedure" (below) can be executed on your local database to create the stored procedure
 
-## Store Kennung 
+## Store Manager 
 
 <ins>Stored Procedure</ins>
 - used to do a full text search on the dbo.Technologies table

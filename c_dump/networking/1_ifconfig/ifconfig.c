@@ -2,7 +2,6 @@
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 // similar to ifconfig / ip addr
 // the programs list the IPv4 / IPv6 addresses of the client

@@ -4,6 +4,7 @@
 // Last updated      : 02.06.24
 // Author            : 0x6x6d
 // Architecture      : x64
+// Platform          : Unix & Windows 
 // Description       : The program is a simple TCP based web server which returns the
 //                     current time as plain text
 //

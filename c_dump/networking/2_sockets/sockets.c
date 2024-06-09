@@ -79,12 +79,12 @@ int main()
     hints.ai_socktype = SOCK_STREAM; // TCP
     hints.ai_flags = AI_PASSIVE;     // bind to wildcard address that will be obtained from the getaddrinfo() function below
 
-    struct addrinfo *bind_address;
-    getaddrinfo(0, "8080", &hints, &bind_address);
+    struct addrinfo *result;
+    getaddrinfo(0, "8080", &hints, &result);
 
     printf("Creating socket...\n");
     SOCKET socket_listen;
-    socket_listen = socket(bind_address->ai_family, bind_address->ai_socktype, bind_address->ai_protocol);
+    socket_listen = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (!ISVALIDSOCKET(socket_listen))
     {
         fprintf(stderr, "socket() failed. (%d)\n", GETSOCKETERRNO());
@@ -100,12 +100,12 @@ int main()
     }
 
     printf("Binding socket to local address...\n");
-    if (bind(socket_listen, bind_address->ai_addr, bind_address->ai_addrlen))
+    if (bind(socket_listen, result->ai_addr, result->ai_addrlen))
     {
         fprintf(stderr, "bind() failed. (%d)\n", GETSOCKETERRNO());
         return 1;
     }
-    freeaddrinfo(bind_address);
+    freeaddrinfo(result);
 
     printf("Listening...\n");
     if (listen(socket_listen, 10) < 0)

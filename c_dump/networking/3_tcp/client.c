@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  int server_sock;
+  int sock;
   struct addrinfo hints;
   struct addrinfo *result;
 
@@ -49,15 +49,14 @@ int main(int argc, char *argv[]) {
               sizeof(address_buffer), service_buffer, sizeof(service_buffer),
               NI_NUMERICHOST);
   printf("[i] %s %s\n", address_buffer, service_buffer);
-  
-  server_sock =
-      socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-  if (server_sock < 0) {
+
+  sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+  if (sock < 0) {
     fprintf(stderr, "[e] socket() failed: %d\n", errno);
     return 1;
   }
 
-  if (connect(server_sock, result->ai_addr, result->ai_addrlen)) {
+  if (connect(sock, result->ai_addr, result->ai_addrlen)) {
     fprintf(stderr, "[e] connect() failed: %d\n", errno);
     return 1;
   }
@@ -69,26 +68,27 @@ int main(int argc, char *argv[]) {
   while (1) {
     fd_set reads;
     FD_ZERO(&reads);
-    FD_SET(server_sock, &reads);
+    FD_SET(0, &reads);
+    FD_SET(sock, &reads);
 
     struct timeval timeout;
     timeout.tv_sec = 0;
     timeout.tv_usec = 100000; // 0.1 seconds
 
-    if (select(server_sock + 1, &reads, 0, 0, &timeout) < 0) {
+    if (select(sock + 1, &reads, 0, 0, &timeout) < 0) {
       fprintf(stderr, "[e] select() failed: %d\n", errno);
       return 1;
     }
 
     // check for terminal input from the server
-    if (FD_ISSET(server_sock, &reads)) {
+    if (FD_ISSET(sock, &reads)) {
       char read[4096];
-      int bytes_received = recv(server_sock, read, 4096, 0);
+      int bytes_received = recv(sock, read, 4096, 0);
       if (bytes_received <= 0) {
         printf("[i] Connection closed by server\n");
         break;
       }
-      printf("[i] Received %d bytes: %.*s\n", bytes_received, bytes_received,
+      printf("[i] Received %d bytes: %.*s", bytes_received, bytes_received,
              read);
     }
 
@@ -99,13 +99,12 @@ int main(int argc, char *argv[]) {
         break;
       }
 
-      printf("[i] Sending %s\n", read);
-      int bytes_send = send(server_sock, read, strlen(read), 0);
+      int bytes_send = send(sock, read, strlen(read), 0);
       printf("[i] Send %d bytes\n", bytes_send);
     }
   }
 
-  close(server_sock);
+  close(sock);
   printf("[i] Closed socket\n");
 
   return 0;

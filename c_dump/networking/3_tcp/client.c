@@ -9,8 +9,10 @@
 // server via terminal inputs
 //
 // use program
-// > ./client
-// start writing stuff into the terminal & press enter
+// terminal 1: ./server
+// termianl 2: ./client 127.0.0.1 50000
+// termianl 3: ./client 127.0.0.1 50000
+// start writing stuff into terminal 2 or 3 & press enter
 //
 
 #include <arpa/inet.h>

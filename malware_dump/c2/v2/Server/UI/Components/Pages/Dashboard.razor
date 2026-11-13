@@ -1,0 +1,118 @@
+﻿@page "/"
+@using Backend.Features.Client.Services
+@using Backend.Features.Settings.Services
+@rendermode InteractiveServer
+@inject IClientService clientService
+@inject ISettingsService settingsService
+
+<PageTitle>c2 - Dashboard</PageTitle>
+
+@* Details *@
+<ClientDetails @ref="_clientDetailsRef" OnDelete="HandleDelete" />   
+
+@* Header *@
+<div class="d-flex flex-row justify-content-between align-items-center">
+    <div class="d-flex flex-column">
+        <div>
+            <span class="fw-bold d-inline-block" style="width: 175px">Total clients:</span>
+            <span>@_allClients?.Count</span>
+        </div>
+        <div>
+            <span class="fw-bold d-inline-block" style="width: 175px">Daily active clients:</span>
+            <span>@_allClients?.Where(client => client.LastConnection.Date == DateTime.Today).Count()</span>
+        </div>
+    </div>
+    <button class="btn btn-secondary" @onclick="RefreshDashboardButton">Refresh</button>
+</div>
+
+<hr class="my-4"/>
+<div class="d-flex flex-row">
+    <div class="d-flex flex-column" style="width: 60%">
+        @* Command Control Panel *@
+        <div class="d-flex flex-column mb-2" style="width: 100%">
+            <h5 class="fw-bold" style="width: 200px">Change Command</h5>
+            <InputTextArea class="form-control" rows="1" @bind-Value="_newCommand"/>
+            <button class="btn btn-primary mt-3" style="width: 100px" @onclick="ChangeCommandButton">Apply</button>
+        </div>
+
+        <hr class="my-4"/>
+        <div>
+            @* Search Bar *@
+            <div class="d-flex flex-row justify-content-end my-3">
+                <input type="text" class="form-control" style="width: 200px" placeholder="Search..." @oninput="FilterClients">
+            </div>
+            @* Table *@
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col" style="width: 3%">
+                        <InputCheckbox class="form-check-input" @bind-Value="AllClientsChecked"/>
+                    </th>
+                    <th scope="col" style="width: 3%">Nr.</th>
+                    <th scope="col" style="width: 18%; cursor: pointer">IP</th>
+                    <th scope="col" style="width: 18%; cursor: pointer">Port</th>
+                    <th scope="col" style="width: 18%; cursor: pointer">Command to Execute</th>
+                    <th scope="col" style="width: 18%; cursor: pointer">Last Connection</th>
+                    <th scope="col" style="width: 18%; cursor: pointer">First Connection</th>
+                    <th scope="col" style="width: 3%; cursor: pointer"></th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (_filteredClients == null || _filteredClients.Count == 0)
+                {
+                    <tr>
+                        <td colspan="12">@_message</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var (index, client) in _filteredClients.Select((item, index) => (index, item)))
+                    {
+                        <tr>
+                            <th>
+                                <InputCheckbox class="form-check-input" @bind-Value="client.Checked"/>
+                            </th>
+                            <th>@(index + 1)</th>
+                            <td>@client.Ip</td>
+                            <td>@client.Port</td>
+                            <td>@client.Command</td>
+                            <td>@client.LastConnection</td>
+                            <td>@client.CreatedDateTime</td>
+                            <td @onclick="() => ShowClientDetailsButton(client)">
+                                <img src="icons/menu.svg" alt="Show Commands" style="width: 20px; height: 20px; cursor: pointer" />
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* Seperator *@
+    <div style="border-right: 2px solid black" class="mx-4"></div>
+
+    @* Settings *@
+    <div style="width: 40%">
+        <h5 class="fw-bold">Settings</h5>
+        <div class="d-flex flex-column">
+            <div class="mb-4">
+                <span class="fw-bold d-inline-block" style="width: 200px">Port:</span>
+                <InputNumber class="form-control" @bind-Value="_settings!.Port" />
+            </div>
+            <div class="mb-4">
+                <span class="fw-bold d-inline-block" style="width: 200px">Default Command:</span>
+                <InputText class="form-control" @bind-Value="_settings!.DefaultCommand" />
+            </div>
+            <div class="mb-4">
+                <span class="fw-bold d-inline-block" style="width: 200px">Receiving Buffer Size:</span>
+                <InputNumber class="form-control" @bind-Value="_settings!.BufferSizeReceive" />
+            </div>
+            @if (!string.IsNullOrEmpty(_messageSettings))
+            {
+                <p>@_messageSettings</p>
+            }
+            <button class="btn btn-primary mt-4" @onclick="UpdateSettingsButton">Update</button>
+        </div>
+    </div>
+</div>

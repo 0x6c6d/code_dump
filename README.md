@@ -17,6 +17,8 @@ Each folder is self-contained. The aim is to learn how things work close to the 
 | Go | [`go_dump`](go_dump) | A minimal HTTP API |
 | JS / TS | [`js_dump`](js_dump) | Next.js 13 apps, React + .NET CRUD |
 | Rust | [`rust_dump`](rust_dump) | CLI tools, async port scanner, EVM bytecode parser, Advent of Code |
+| AI | [`ai_dump`](ai_dump) | AI and machine learning experiments and notes (see its README) |
+| Malware | [`malware_dump`](malware_dump) | Malware-related research material (see its README) |
 
 ---
 
@@ -191,5 +193,7 @@ code_dump/
 ├── csharp_dump/     ASP.NET / Blazor tutorial projects
 ├── go_dump/         sample_api
 ├── js_dump/         Next.js and React projects
-└── rust_dump/       CLI tools, parsers, exercises
+├── rust_dump/       CLI tools, parsers, exercises
+├── ai_dump/         AI / ML code and notes
+└── malware_dump/    malware-related material
 ```

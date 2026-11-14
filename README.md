@@ -1,6 +1,6 @@
 # code_dump
 
-A collection of small sample projects, exercises and experiments in **Assembly, C, C++, C#, Go, JavaScript / TypeScript and Rust**.
+A collection of small sample projects, exercises and experiments in **Assembly, C, C++, C#, Go, JavaScript / TypeScript and Rust**, plus Windows internals (kernel drivers and the Native API).
 
 Each folder is self-contained. The aim is to learn how things work close to the metal (syscalls, sockets, bootloaders, memory) as well as how they are built at the top of the stack (web APIs, frontends, architecture patterns).
 
@@ -17,6 +17,7 @@ Each folder is self-contained. The aim is to learn how things work close to the 
 | Go | [`go_dump`](go_dump) | A minimal HTTP API |
 | JS / TS | [`js_dump`](js_dump) | Next.js 13 apps, React + .NET CRUD |
 | Rust | [`rust_dump`](rust_dump) | CLI tools, async port scanner, EVM bytecode parser, Advent of Code |
+| Windows | [`windows_dump`](windows_dump) | Kernel drivers (WDK), IOCTL communication, the Windows Native API |
 | AI | [`ai_dump`](ai_dump) | AI and machine learning experiments and notes (see its README) |
 | Malware | [`malware_dump`](malware_dump) | Malware-related research material (see its README) |
 
@@ -152,6 +153,29 @@ All projects are .NET solutions (`.sln`). Open them in Visual Studio or Rider, o
 | `aoc_2023` | Advent of Code 2023, days 1 and 2, parts 1 and 2 as separate binaries |
 | `rustlings` | Copy of the [rustlings](https://github.com/rust-lang/rustlings) exercise runner with a few exercises |
 
+## Windows
+
+Visual Studio projects, built with the Windows Driver Kit (WDK) and MSVC. The drivers are learning projects: load them only in a test VM with test signing enabled (`bcdedit /set testsigning on`). The `km` folders are kernel mode, the `um` folders are user mode.
+
+**Kernel drivers** (`windows_dump/driver_*`)
+
+| Project | What it is |
+| --- | --- |
+| `driver_1` | Driver with IOCTL codes (`attach`, `read`, `write`) and `MmCopyVirtualMemory`, made loadable with `kdmapper` via `IoCreateDriver`. The `um` app finds a process and its modules through a snapshot and talks to the driver. |
+| `driver_2` | The minimal driver: `DriverEntry`, an unload routine and `KdPrint`. The comments explain installing it with `sc create`. |
+| `driver_3` | Sets a thread's priority to any value, which `SetPriorityClass()` does not allow. It uses a device object, a symbolic link and `IRP_MJ_CREATE` / `IRP_MJ_WRITE` dispatch routines. Usage: `um <threadid> <priority>`. |
+| `driver_4` | Communicates through a hook on a kernel function (`NtOpenCompositionSurfaceSectionInfo`) instead of a device object. It reads and writes process memory (`MmCopyVirtualMemory`, `KeStackAttachProcess`) and looks up module base addresses. |
+
+**Native API** (`windows_dump/native_api/WindowsNativeApi`)
+
+| File | What it does |
+| --- | --- |
+| `1_ImportNtdll.cpp` | Calls `NtQuerySystemInformation` by linking against `ntdll` |
+| `2_DynamicLinkingNtdll.cpp` | The same call, resolved at runtime with `GetModuleHandleW` and `GetProcAddress` |
+| `3_PhntWindowsH.cpp` | Uses the `phnt` headers (installed with vcpkg) to get the native definitions |
+| `4_Strings.cpp` | Native `UNICODE_STRING` handling |
+| `5_LinkedLists.cpp` | Empty placeholder for the next sample (kernel linked lists) |
+
 ---
 
 ## Building and running
@@ -177,11 +201,14 @@ cd rust_dump/<project> && cargo run
 # JS / TS
 cd js_dump/<project> && npm install && npm run dev
 
+# Windows (Native API samples, Developer Command Prompt)
+cl 1_ImportNtdll.cpp
+
 # C#
 dotnet run --project <project>.csproj
 ```
 
-Check a project's own `README.md` for extra requirements, such as `qemu` and `mtools` for the bootloader, `libuv` for the proxy, or API keys for the news app.
+Check a project's own `README.md` for extra requirements, such as `qemu` and `mtools` for the bootloader, `libuv` for the proxy, API keys for the news app, or the WDK for the drivers.
 
 ## Repository layout
 
@@ -194,6 +221,7 @@ code_dump/
 ├── go_dump/         sample_api
 ├── js_dump/         Next.js and React projects
 ├── rust_dump/       CLI tools, parsers, exercises
+├── windows_dump/    kernel drivers, Native API
 ├── ai_dump/         AI / ML code and notes
 └── malware_dump/    malware-related material
 ```
